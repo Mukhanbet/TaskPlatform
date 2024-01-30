@@ -34,8 +34,8 @@ public class TaskController {
         service.deleteByName(name);
     }
 
-    @PostMapping("/create")
-    public void create(@RequestBody TaskRequest taskRequest) {
-        service.create(taskRequest);
+    @PostMapping("/create/{userEmail}")
+    public void create(@RequestBody TaskRequest taskRequest, @PathVariable String userEmail) {
+        service.create(taskRequest, userEmail);
     }
 }

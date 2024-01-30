@@ -16,4 +16,8 @@ public class Task {
     @Column(unique = true)
     private String name;
     private String description;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "Author", referencedColumnName = "email")
+    private User user;
 }

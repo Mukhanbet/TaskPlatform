@@ -36,7 +36,7 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService {
     public void updateByEmail(String email, UserRequest userRequest) {
         Optional<User> user = userRepository.findByEmail(email);
         checker(user, email);
-        if(userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+        if(userRepository.findByEmail(userRequest.getEmail()).isPresent() && !email.equals(userRequest.getEmail())) {
             throw new BadCredentialsException("user with email: " + userRequest.getEmail() + " is already exist!");
         }
         user.get().setName(userRequest.getName());

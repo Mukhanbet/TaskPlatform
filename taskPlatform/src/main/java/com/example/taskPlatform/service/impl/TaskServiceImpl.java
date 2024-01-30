@@ -3,10 +3,12 @@ package com.example.taskPlatform.service.impl;
 import com.example.taskPlatform.dto.task.TaskRequest;
 import com.example.taskPlatform.dto.task.TaskResponse;
 import com.example.taskPlatform.entities.Task;
+import com.example.taskPlatform.entities.User;
 import com.example.taskPlatform.exception.BadCredentialsException;
 import com.example.taskPlatform.exception.NotFoundException;
 import com.example.taskPlatform.mapper.TaskMapper;
 import com.example.taskPlatform.repositories.TaskRepository;
+import com.example.taskPlatform.repositories.UserRepository;
 import com.example.taskPlatform.service.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
     private final TaskMapper taskMapper;
     @Override
     public List<TaskResponse> getAll() {
@@ -36,7 +39,7 @@ public class TaskServiceImpl implements TaskService {
     public void updateByName(String name, TaskRequest taskRequest) {
         Optional<Task> task = taskRepository.findByName(name);
         checker(task, name);
-        if(taskRepository.findByName(taskRequest.getName()).isPresent()) {
+        if(taskRepository.findByName(taskRequest.getName()).isPresent() && !name.equals(taskRequest.getName())) {
             throw new BadCredentialsException("Task with name " + taskRequest.getName() + " have already exist!");
         }
         task.get().setName(taskRequest.getName());
@@ -52,13 +55,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void create(TaskRequest taskRequest) {
+    public void create(TaskRequest taskRequest, String userEmail) {
         if (taskRepository.findByName(taskRequest.getName()).isPresent()) {
             throw new BadCredentialsException("Task with name " + taskRequest.getName() + " have already exist!");
+        }
+        Optional<User> user = userRepository.findByEmail(userEmail);
+        if(user.isEmpty()) {
+            throw new NotFoundException("User with email " + userEmail + " not found", HttpStatus.NOT_FOUND);
         }
         Task task = new Task();
         task.setName(taskRequest.getName());
         task.setDescription(taskRequest.getDescription());
+        task.setUser(user.get());
         taskRepository.save(task);
     }
 
