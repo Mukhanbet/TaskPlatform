@@ -1,5 +1,7 @@
 package com.example.taskPlatform.service;
 
+import com.example.taskPlatform.dto.login.AuthLoginRequest;
+import com.example.taskPlatform.dto.login.AuthLoginResponse;
 import com.example.taskPlatform.dto.user.UserRequest;
 import com.example.taskPlatform.dto.user.UserResponse;
 
@@ -11,4 +13,5 @@ public interface MyUserDetailsService {
     void updateByEmail(String email, UserRequest userRequest);
     void deleteByEmail(String email);
     void register(UserRequest userRequest);
+    AuthLoginResponse login(AuthLoginRequest authLoginRequest);
 }

@@ -1,5 +1,7 @@
 package com.example.taskPlatform.controllers;
 
+import com.example.taskPlatform.dto.login.AuthLoginRequest;
+import com.example.taskPlatform.dto.login.AuthLoginResponse;
 import com.example.taskPlatform.dto.user.UserRequest;
 import com.example.taskPlatform.dto.user.UserResponse;
 import com.example.taskPlatform.service.MyUserDetailsService;
@@ -37,5 +39,10 @@ public class UserController {
     @PostMapping("/register")
     public void register(@RequestBody UserRequest userRequest) {
         service.register(userRequest);
+    }
+
+    @PostMapping("/login")
+    public AuthLoginResponse login(AuthLoginRequest authLoginRequest) {
+        return service.login(authLoginRequest);
     }
 }

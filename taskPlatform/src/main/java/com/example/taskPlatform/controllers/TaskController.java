@@ -19,6 +19,16 @@ public class TaskController {
         return service.getAll();
     }
 
+    @GetMapping("/getAllAvailableTasks")
+    public List<TaskResponse> getAllAvailableTasks() {
+        return service.getAllAvailableTasks();
+    }
+
+    @GetMapping("/getAllArchive")
+    public List<TaskResponse> getAllArchive() {
+        return service.getAllArchivedTasks();
+    }
+
     @GetMapping("/findByName/{name}")
     public TaskResponse findByName(@PathVariable String name) {
         return service.findByName(name);
@@ -29,13 +39,18 @@ public class TaskController {
         service.updateByName(name, taskRequest);
     }
 
-    @DeleteMapping("/deleteByName/{name}")
-    public void deleteByName(@PathVariable String name) {
-        service.deleteByName(name);
+    @PutMapping("/cancelByName/{name}")
+    public void cancelByName(@PathVariable String name) {
+        service.cancelByName(name);
     }
 
     @PostMapping("/create/{userEmail}")
     public void create(@RequestBody TaskRequest taskRequest, @PathVariable String userEmail) {
         service.create(taskRequest, userEmail);
+    }
+
+    @PutMapping("/assignTaskToUser/{taskName}/user/{userEmail}")
+    public void assignTaskToUser(@PathVariable String taskName,@PathVariable String userEmail) {
+        service.assignTaskToUser(taskName, userEmail);
     }
 }

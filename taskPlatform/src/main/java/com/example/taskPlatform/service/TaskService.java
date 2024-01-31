@@ -7,8 +7,11 @@ import java.util.List;
 
 public interface TaskService {
     List<TaskResponse> getAll();
+    List<TaskResponse> getAllAvailableTasks();
+    List<TaskResponse> getAllArchivedTasks();
     TaskResponse findByName(String name);
     void updateByName(String name, TaskRequest taskRequest);
-    void deleteByName(String name);
+    void cancelByName(String name);
     void create(TaskRequest taskRequest, String userEmail);
+    void assignTaskToUser(String taskName, String userEmail);
 }

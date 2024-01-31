@@ -4,6 +4,7 @@ import com.example.taskPlatform.dto.task.TaskRequest;
 import com.example.taskPlatform.dto.task.TaskResponse;
 import com.example.taskPlatform.entities.Task;
 import com.example.taskPlatform.entities.User;
+import com.example.taskPlatform.enums.Level;
 import com.example.taskPlatform.exception.BadCredentialsException;
 import com.example.taskPlatform.exception.NotFoundException;
 import com.example.taskPlatform.mapper.TaskMapper;
@@ -14,6 +15,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,34 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskResponse> getAll() {
         return taskMapper.toDtoS(taskRepository.findAll());
+    }
+
+    @Override
+    public List<TaskResponse> getAllAvailableTasks() {
+        List<Task> tasks = new ArrayList<>();
+        for(Task task : taskRepository.findAll()) {
+            if(task.isAvailable()) {
+                tasks.add(task);
+            }
+        }
+        if(tasks.isEmpty()) {
+            throw new NotFoundException("There is no any available tasks! ", HttpStatus.NOT_FOUND);
+        }
+        return taskMapper.toDtoS(tasks);
+    }
+
+    @Override
+    public List<TaskResponse> getAllArchivedTasks() {
+        List<Task> tasks = new ArrayList<>();
+        for(Task task : taskRepository.findAll()) {
+            if(!task.isAvailable()) {
+                tasks.add(task);
+            }
+        }
+        if(tasks.isEmpty()) {
+            throw new NotFoundException("There is no any task in archive!", HttpStatus.NOT_FOUND);
+        }
+        return taskMapper.toDtoS(tasks);
     }
 
     @Override
@@ -48,10 +79,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void deleteByName(String name) {
+    public void cancelByName(String name) {
         Optional<Task> task = taskRepository.findByName(name);
         checker(task, name);
-        taskRepository.deleteByName(name);
+        task.get().setAvailable(false);
+        taskRepository.save(task.get());
     }
 
     @Override
@@ -66,8 +98,24 @@ public class TaskServiceImpl implements TaskService {
         Task task = new Task();
         task.setName(taskRequest.getName());
         task.setDescription(taskRequest.getDescription());
+        task.setAvailable(true);
+        task.setLevel(Level.valueOf(taskRequest.getLevel()));
+        task.setCreatedDay(LocalDate.now());
         task.setUser(user.get());
         taskRepository.save(task);
+        user.get().getTasks().add(task);
+        userRepository.save(user.get());
+    }
+
+    @Override
+    public void assignTaskToUser(String taskName, String userEmail) {
+        Optional<Task> task = taskRepository.findByName(taskName);
+        Optional<User> user = userRepository.findByEmail(userEmail);
+        if(user.isEmpty()) {
+            throw new NotFoundException("User with email " + userEmail + " not found", HttpStatus.NOT_FOUND);
+        }
+        task.get().setSolver(userEmail);
+        taskRepository.save(task.get());
     }
 
     private void checker(Optional<Task> task, String name) {
