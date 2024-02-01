@@ -3,11 +3,13 @@ package com.example.taskPlatform.service.impl;
 import com.example.taskPlatform.dto.task.TaskRequest;
 import com.example.taskPlatform.dto.task.TaskResponse;
 import com.example.taskPlatform.entities.Task;
+import com.example.taskPlatform.entities.TaskLevel;
 import com.example.taskPlatform.entities.User;
 import com.example.taskPlatform.enums.Level;
 import com.example.taskPlatform.exception.BadCredentialsException;
 import com.example.taskPlatform.exception.NotFoundException;
 import com.example.taskPlatform.mapper.TaskMapper;
+import com.example.taskPlatform.repositories.TaskLevelRepository;
 import com.example.taskPlatform.repositories.TaskRepository;
 import com.example.taskPlatform.repositories.UserRepository;
 import com.example.taskPlatform.service.TaskService;
@@ -26,6 +28,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
+    private final TaskLevelRepository taskLevelRepository;
     @Override
     public List<TaskResponse> getAll() {
         return taskMapper.toDtoS(taskRepository.findAll());
@@ -95,11 +98,15 @@ public class TaskServiceImpl implements TaskService {
         if(user.isEmpty()) {
             throw new NotFoundException("User with email " + userEmail + " not found", HttpStatus.NOT_FOUND);
         }
+        Optional<TaskLevel> taskLevel = taskLevelRepository.findByLevel(taskRequest.getLevel());
+        if(taskLevel.isEmpty()) {
+            throw new NotFoundException(taskRequest.getLevel() + " level not exist in system!", HttpStatus.NOT_FOUND);
+        }
         Task task = new Task();
         task.setName(taskRequest.getName());
         task.setDescription(taskRequest.getDescription());
         task.setAvailable(true);
-        task.setLevel(Level.valueOf(taskRequest.getLevel()));
+        task.setTaskLevel(taskLevel.get());
         task.setCreatedDay(LocalDate.now());
         task.setUser(user.get());
         taskRepository.save(task);

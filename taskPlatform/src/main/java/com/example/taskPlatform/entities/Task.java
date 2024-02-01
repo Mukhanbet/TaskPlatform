@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,10 +24,12 @@ public class Task {
     @Column(name = "created_day")
     private LocalDate createdDay;
     private String solver;
-    @Enumerated(EnumType.STRING)
-    private Level level;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "Author", referencedColumnName = "email")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "level", referencedColumnName = "level")
+    private TaskLevel taskLevel;
 }
