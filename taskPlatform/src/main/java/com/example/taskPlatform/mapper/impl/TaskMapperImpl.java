@@ -22,7 +22,7 @@ public class TaskMapperImpl implements TaskMapper {
         taskResponse.setCreatedDay(task.getCreatedDay());
         taskResponse.setAuthor(task.getUser().getName());
         taskResponse.setSolver(task.getSolver());
-        taskResponse.setLevel(String.valueOf(task.getTaskLevel()));
+        taskResponse.setLevel(task.getTaskLevel().getLevel());
 //        if(!task.isAvailable()) {
 //            taskResponse.setStatus("Canceled");
 //        } else if (task.isAvailable()) {

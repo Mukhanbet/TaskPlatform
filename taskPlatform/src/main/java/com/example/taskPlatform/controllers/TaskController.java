@@ -29,6 +29,11 @@ public class TaskController {
         return service.getAllArchivedTasks();
     }
 
+    @GetMapping("/getByLevel/{level}")
+    public List<TaskResponse> getTasksByLevel(@PathVariable String level) {
+        return service.getTasksByLevel(level);
+    }
+
     @GetMapping("/findByName/{name}")
     public TaskResponse findByName(@PathVariable String name) {
         return service.findByName(name);

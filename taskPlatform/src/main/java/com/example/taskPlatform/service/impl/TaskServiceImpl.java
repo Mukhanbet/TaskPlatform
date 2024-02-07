@@ -63,6 +63,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public List<TaskResponse> getTasksByLevel(String level) {
+        if(taskLevelRepository.findByLevel(level).isEmpty()) {
+            throw new BadCredentialsException("There is no like this (" + level + ") level in system");
+        }
+        List<Task> tasks = new ArrayList<>();
+        for(Task task : taskRepository.findAll()) {
+            if(task.getTaskLevel().getLevel().equals(level)) {
+                tasks.add(task);
+            }
+        }
+        return taskMapper.toDtoS(tasks);
+    }
+
+    @Override
     public TaskResponse findByName(String name) {
         Optional<Task> task = taskRepository.findByName(name);
         checker(task, name);
